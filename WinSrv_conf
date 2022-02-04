@@ -1,0 +1,90 @@
+<powershell>
+
+# Run Powershell as an Administrator
+
+Start-Process -FilePath "powershell" -Verb RunAs;
+
+# Disable Windows Firewall
+
+Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
+
+
+#---------------------------------------------------------------------------------------------------
+
+# Download and Install Chrome 
+
+$LocalTempDir = $env:TEMP; $ChromeInstaller = "ChromeInstaller.exe"; (new-object    System.Net.WebClient).DownloadFile('http://dl.google.com/chrome/install/375.126/chrome_installer.exe', "$LocalTempDir\$ChromeInstaller"); & "$LocalTempDir\$ChromeInstaller" /silent /install; $Process2Monitor =  "ChromeInstaller"; Do { $ProcessesFound = Get-Process | ?{$Process2Monitor -contains $_.Name} | Select-Object -ExpandProperty Name; If ($ProcessesFound) { "Still running: $($ProcessesFound -join ', ')" | Write-Host; Start-Sleep -Seconds 2 } else { rm "$LocalTempDir\$ChromeInstaller" -ErrorAction SilentlyContinue -Verbose } } Until (!$ProcessesFound);
+
+#---------------------------------------------------------------------------------------------------
+
+
+# Download and Install VPN Only FortiClient
+
+$LocalTempDir = $env:TEMP; $FortiClientInstaller = "FortiClient_VPN_Only.exe"; (new-object    System.Net.WebClient).DownloadFile('http://terraform-bootstrapping-files.s3.amazonaws.com/FortiClient_VPN_Only_7.0.2.exe', "$LocalTempDir\$FortiClientInstaller"); & "$LocalTempDir\$FortiClientInstaller" /quiet /norestart /install; $Process2Monitor =  "FortiClientInstaller"; Do { $ProcessesFound = Get-Process | ?{$Process2Monitor -contains $_.Name} | Select-Object -ExpandProperty Name; If ($ProcessesFound) { "Still running: $($ProcessesFound -join ', ')" | Write-Host; Start-Sleep -Seconds 2 } else { rm "$LocalTempDir\$FortiClientInstaller" -ErrorAction SilentlyContinue -Verbose } } Until (!$ProcessesFound);
+
+#Start-BitsTransfer –Source  'https://filestore.fortinet.com/forticlient/downloads/FortiClientVPNOnlineInstaller_7.0.exe'  -Destination 'C:\Users\Administrator\Desktop'
+
+#---------------------------------------------------------------------------------------------------
+
+# Download FortiClientEMS // No Installation // 
+
+$LocalTempDir = ‘C:\Users\Administrator\Desktop’; $FortiClientEMS = “FortiClientEndpointManagementServer.exe”; (new-object    System.Net.WebClient).DownloadFile('http://terraform-bootstrapping-files.s3.amazonaws.com/FortiClientEndpointManagementServer.exe', "$LocalTempDir\$FortiClientEMS"); 
+
+#---------------------------------------------------------------------------------------------------
+
+# Download and Install Wireshark x64
+
+$LocalTempDir = ‘C:\Users\Administrator\Desktop’; $Wireshark = “Wireshark.exe”; (new-object    System.Net.WebClient).DownloadFile('http://terraform-bootstrapping-files.s3.amazonaws.com/Wireshark.exe', "$LocalTempDir\$Wireshark"); & "$LocalTempDir\$Wireshark" /quiet /norestart /install; $Process2Monitor =  "Wireshark"; Do { $ProcessesFound = Get-Process | ?{$Process2Monitor -contains $_.Name} | Select-Object -ExpandProperty Name; If ($ProcessesFound) { "Still running: $($ProcessesFound -join ', ')" | Write-Host; Start-Sleep -Seconds 2 } else { rm "$LocalTempDir\$Wireshark" -ErrorAction SilentlyContinue -Verbose } } Until (!$ProcessesFound);
+
+#---------------------------------------------------------------------------------------------------
+
+
+
+
+# Silent Install Firefox 
+# Download URL: https://www.mozilla.org/en-US/firefox/all/
+
+# Path for the workdir
+$workdir = "c:\installer\"
+
+# Check if work directory exists if not create it
+
+If (Test-Path -Path $workdir -PathType Container)
+{ Write-Host "$workdir already exists" -ForegroundColor Red}
+ELSE
+{ New-Item -Path $workdir  -ItemType directory }
+
+# Download the installer
+
+$source = "https://download.mozilla.org/?product=firefox-latest-ssl&os=win64&lang=en-US"
+$destination = "$workdir\firefox.exe"
+
+# Check if Invoke-Webrequest exists otherwise execute WebClient
+
+if (Get-Command 'Invoke-Webrequest')
+{
+    Invoke-WebRequest $source -OutFile $destination
+}
+else
+{
+    $WebClient = New-Object System.Net.WebClient
+    $webclient.DownloadFile($source, $destination)
+}
+
+# Start the installation
+
+Start-Process -FilePath "$workdir\firefox.exe" -ArgumentList "/S"
+
+# Wait XX Seconds for the installation to finish
+
+Start-Sleep -s 35
+
+# Remove the installer
+
+rm -Force $workdir\firefox*
+
+
+# ---------------------------------------------------------------------------------------------------
+
+</powershell>
+<persist>true</persist>
