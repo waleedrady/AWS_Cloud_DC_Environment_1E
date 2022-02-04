@@ -26,19 +26,19 @@ $LocalTempDir = $env:TEMP; $FortiClientInstaller = "FortiClient_VPN_Only.exe"; (
 
 #---------------------------------------------------------------------------------------------------
 
+# Download Wireshark x64 // No Installation // 
+
+$LocalTempDir = ‘C:\Users\Administrator\Desktop’; $Wireshark = “Wireshark.exe”; (new-object    System.Net.WebClient).DownloadFile('http://terraform-bootstrapping-files.s3.amazonaws.com/Wireshark.exe', "$LocalTempDir\$Wireshark"); & "$LocalTempDir\$Wireshark" /S /desktopicon=yes /quicklaunchicon=yes ; $Process2Monitor =  "Wireshark"; Do { $ProcessesFound = Get-Process | ?{$Process2Monitor -contains $_.Name} | Select-Object -ExpandProperty Name; If ($ProcessesFound) { "Still running: $($ProcessesFound -join ', ')" | Write-Host; Start-Sleep -Seconds 2 } else { rm "$LocalTempDir\$Wireshark" -ErrorAction SilentlyContinue -Verbose } } Until (!$ProcessesFound);
+
+C:\Users\Administrator\Desktop\Wireshark.exe /S /desktopicon=yes /quicklaunchicon=yes
+
+#---------------------------------------------------------------------------------------------------
+
 # Download FortiClientEMS // No Installation // 
 
-$LocalTempDir = ‘C:\Users\Administrator\Desktop’; $FortiClientEMS = “FortiClientEndpointManagementServer.exe”; (new-object    System.Net.WebClient).DownloadFile('http://terraform-bootstrapping-files.s3.amazonaws.com/FortiClientEndpointManagementServer.exe', "$LocalTempDir\$FortiClientEMS"); 
+$LocalTempDir = ‘C:\Users\Administrator\Desktop’; $FortiClientEMS = “FortiClientEndpointManagementServer.exe”; (new-object    System.Net.WebClient).DownloadFile('https://terraform-bootstrapping-files.s3.amazonaws.com/FortiClientEndpointManagementServer.exe', "$LocalTempDir\$FortiClientEMS"); 
 
 #---------------------------------------------------------------------------------------------------
-
-# Download and Install Wireshark x64
-
-$LocalTempDir = ‘C:\Users\Administrator\Desktop’; $Wireshark = “Wireshark.exe”; (new-object    System.Net.WebClient).DownloadFile('http://terraform-bootstrapping-files.s3.amazonaws.com/Wireshark.exe', "$LocalTempDir\$Wireshark"); & "$LocalTempDir\$Wireshark" /quiet /norestart /install; $Process2Monitor =  "Wireshark"; Do { $ProcessesFound = Get-Process | ?{$Process2Monitor -contains $_.Name} | Select-Object -ExpandProperty Name; If ($ProcessesFound) { "Still running: $($ProcessesFound -join ', ')" | Write-Host; Start-Sleep -Seconds 2 } else { rm "$LocalTempDir\$Wireshark" -ErrorAction SilentlyContinue -Verbose } } Until (!$ProcessesFound);
-
-#---------------------------------------------------------------------------------------------------
-
-
 
 
 # Silent Install Firefox 
@@ -63,7 +63,7 @@ $destination = "$workdir\firefox.exe"
 
 if (Get-Command 'Invoke-Webrequest')
 {
-    Invoke-WebRequest $source -OutFile $destination
+     Invoke-WebRequest $source -OutFile $destination
 }
 else
 {
